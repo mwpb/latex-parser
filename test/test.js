@@ -71,3 +71,19 @@ it("Nested \\frac.", () => {
 	var expected = new math.OperatorNode("/", "divide", [n12, fracInner]);
 	assert.deepEqual(expected, expression);
 });
+
+it("Simple unary minus.", () => {
+	var expression = math.fromTex("-1");
+	var n1 = new math.SymbolNode("1");
+	var expected = new math.OperatorNode("-", "unary_minus", [n1]);
+	assert.deepEqual(expected, expression);
+});
+
+it("Unary minus.", () => {
+	var expression = math.fromTex("1+-1");
+	var n11 = new math.SymbolNode("1");
+	var n12 = new math.SymbolNode("1");
+	var minus = new math.OperatorNode("-", "unary_minus", [n11]);
+	var expected = new math.OperatorNode("+", "sum", [n12, minus]);
+	assert.deepEqual(expected, expression);
+});
