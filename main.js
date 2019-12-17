@@ -16,6 +16,14 @@ var operatorPrecedence = {
 	")": 0
 }
 
+var symbolToFunction = {
+	"^": "pow",
+	"*": "multiply",
+	"/": "divide",
+	"+": "sum",
+	"-": "subtract",
+}
+
 var tokenise = (s) => {
 	let tokens = [];
 	let token = "";
@@ -62,7 +70,7 @@ var shuntingYard = (tokens) => {
 	var outputOperator = (operator) => {
 		let second = output.pop();
 		let first = output.pop();
-		let op = new math.OperatorNode(operator, "operator", [first, second]);
+		let op = new math.OperatorNode(operator, symbolToFunction[operator], [first, second]);
 		output.push(op);
 	}
 
@@ -91,7 +99,7 @@ var shuntingYard = (tokens) => {
 			while ( operators.length > 0 && operators[operators.length - 1] != "(") {
 				outputOperator(operators.pop());
 			}
-			if (peek = "(") {
+			if (operators[operators.length - 1] = "(") {
 				operators.pop();
 			}
 		}
