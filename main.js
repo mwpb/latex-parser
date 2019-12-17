@@ -2,9 +2,10 @@ var math = require("mathjs");
 
 // probably would be better if these arrays were sets...
 let parens = ["{", "}", "(", ")", " "];
-let infixes = ["+", "-", "*", "/", "^", "=", "_"];
+let infixes = ["+", "-", "*", "\\frac_curry", "/", "^", "=", "_", "\\frac"];
 let binaryPrefixes = ["\\frac"];
 let ignoredCommands = ["\\left", "\\right", " "];
+let rightAssoc = ["\\frac", "\\frac_curry", "^"];
 
 var operatorPrecedence = {
 	"^": 4,
@@ -16,12 +17,22 @@ var operatorPrecedence = {
 	")": 0
 }
 
-var symbolToFunction = {
+var symbol2Normal = (s) => {
+	if (s === "\\frac" || s === "\\frac_curry") {
+		return "/";
+	} else {
+		return s;
+	}
+}
+
+var symbol2Function = {
 	"^": "pow",
 	"*": "multiply",
 	"/": "divide",
 	"+": "sum",
 	"-": "subtract",
+	"\\frac": "divide",
+	"\\frac_curry": "divide"
 }
 
 var tokenise = (s) => {
@@ -68,15 +79,15 @@ var shuntingYard = (tokens) => {
 	}
 
 	var outputOperator = (operator) => {
+		// console.log(output);
 		let second = output.pop();
 		let first = output.pop();
-		let op = new math.OperatorNode(operator, symbolToFunction[operator], [first, second]);
+		let op = new math.OperatorNode(symbol2Normal(operator), symbol2Function[operator], [first, second]);
 		output.push(op);
 	}
 
 	let output = [];
 	let operators = [];
-
 	while (tokens.length > 0) {
 		let token = tokens.pop();
 		// console.log(`${token} || ${output} || ${operators}`);
@@ -85,12 +96,18 @@ var shuntingYard = (tokens) => {
 		} else if (infixes.includes(token)) {
 			while (operators.length > 0 &&
 				(
+					(binaryPrefixes.includes(operators[operators.length - 1])) ||
 					(operatorPrecedence[operators[operators.length - 1]] > operatorPrecedence[token]) ||
 					(
 						(operatorPrecedence[operators[operators.length - 1]] == operatorPrecedence[token]) && 
-						(operators[operators.length - 1] != "^"))
+						(!rightAssoc.includes(operators[operators.length - 1])))
 				)) {
-				outputOperator(operators.pop());
+				var operator = operators.pop();
+				if (binaryPrefixes.includes(operator)) {
+					operators.push(operator+"_curry");
+				} else {
+					outputOperator(operator);
+				}
 			}
 			operators.push(token);
 		} else if (token == "(") {
