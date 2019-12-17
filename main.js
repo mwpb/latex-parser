@@ -1,11 +1,10 @@
 var math = require("mathjs");
 
-// probably would be better if these arrays were sets...
-let parens = ["{", "}", "(", ")", " "];
-let infixes = ["+", "-", "*", "\\frac_curry", "/", "^", "=", "_", "\\frac"];
-let binaryPrefixes = ["\\frac"];
-let ignoredCommands = ["\\left", "\\right", " "];
-let rightAssoc = ["\\frac", "\\frac_curry", "^"];
+let parens = new Set(["{", "}", "(", ")", " "]);
+let infixes = new Set(["+", "-", "*", "\\frac_curry", "/", "^", "=", "_", "\\frac"]);
+let binaryPrefixes = new Set(["\\frac"]);
+let ignoredCommands = new Set(["\\left", "\\right", " "]);
+let rightAssoc = new Set(["\\frac", "\\frac_curry", "^"]);
 
 var operatorPrecedence = {
 	"^": 4,
@@ -40,13 +39,13 @@ var tokenise = (s) => {
 	let token = "";
 	let inCommand = false;
 	var checkThenPush = (token) => {
-		if (token.length > 0 && !ignoredCommands.includes(token)) {
+		if (token.length > 0 && !ignoredCommands.has(token)) {
 			tokens.push(token);
 		}
 	}
 	for (let i = 0; i < s.length; i++) {
 		let c = s.charAt(i);
-		if (parens.includes(c) || infixes.includes(c)) {
+		if (parens.has(c) || infixes.has(c)) {
 			inCommand = false;
 			checkThenPush(token);
 			checkThenPush(c);
@@ -66,7 +65,7 @@ var tokenise = (s) => {
 }
 
 var isOperand = (token) => {
-	if (token.startsWith("\\") || parens.includes(token) || infixes.includes(token)) {
+	if (token.startsWith("\\") || parens.has(token) || infixes.has(token)) {
 		return false;
 	}
 	return true;
@@ -93,17 +92,17 @@ var shuntingYard = (tokens) => {
 		// console.log(`${token} || ${output} || ${operators}`);
 		if (isOperand(token)) {
 			outputOperand(token);
-		} else if (infixes.includes(token)) {
+		} else if (infixes.has(token)) {
 			while (operators.length > 0 &&
 				(
-					(binaryPrefixes.includes(operators[operators.length - 1])) ||
+					(binaryPrefixes.has(operators[operators.length - 1])) ||
 					(operatorPrecedence[operators[operators.length - 1]] > operatorPrecedence[token]) ||
 					(
 						(operatorPrecedence[operators[operators.length - 1]] == operatorPrecedence[token]) && 
-						(!rightAssoc.includes(operators[operators.length - 1])))
+						(!rightAssoc.has(operators[operators.length - 1])))
 				)) {
 				var operator = operators.pop();
-				if (binaryPrefixes.includes(operator)) {
+				if (binaryPrefixes.has(operator)) {
 					operators.push(operator+"_curry");
 				} else {
 					outputOperator(operator);
