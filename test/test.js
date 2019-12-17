@@ -15,7 +15,7 @@ it("Parsing binary addition.", () => {
 });
 
 it("Parsing infix operators.", () => {
-	var expression = math.fromTex("3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3");
+	var expression = math.fromTex("3 + 4 * 2 / (( 1 - 5 ) ^ 2) ^ 3");
 	var n1 = new math.SymbolNode("1");
 	var n2 = new math.SymbolNode("2");
 	var n22 = new math.SymbolNode("2");
@@ -29,19 +29,5 @@ it("Parsing infix operators.", () => {
 	var mult = new math.OperatorNode("*", "multiply", [n4, n2]);
 	var divides = new math.OperatorNode("/", "divide", [mult, expThree]);
 	var plus = new math.OperatorNode("+", "sum", [n3, divides]);
-	// assert.deepEqual(plus, expression);
-	console.log(plus.evaluate({
-		"1": 1,
-		"2": 2,
-		"3": 3,
-		"4": 4,
-		"5": 5,
-	}));
-	console.log(expression.evaluate({
-		"1": 1,
-		"2": 2,
-		"3": 3,
-		"4": 4,
-		"5": 5,
-	}));
+	assert.deepEqual(plus, expression);
 })
