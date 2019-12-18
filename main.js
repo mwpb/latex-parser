@@ -1,12 +1,12 @@
 var math = require("mathjs");
 
 let parens = new Set(["{", "}", "(", ")", " "]);
-let infixes = new Set(["+", "-", "*", "\\frac_curry", "/", "^", "=", "_", "\\frac"]);
+let infixes = new Set(["+", "-", "*", "\\frac_curry", "/", "^", "=", "_", "\\frac", "\\pm"]);
 let binaryPrefixes = new Set(["\\frac"]);
 let ignoredCommands = new Set(["\\left", "\\right", " "]);
 let rightAssoc = new Set(["\\frac", "\\frac_curry", "^"]);
-let functions = new Set(["#"]);
-let closingBrackets = new Set(["}", ")"]);
+let functions = new Set(["#", "\\sqrt"]);
+let openingBrackets = new Set(["{", "("]);
 
 var operatorPrecedence = {
 	"^": 4,
@@ -14,8 +14,10 @@ var operatorPrecedence = {
 	"/": 3,
 	"+": 2,
 	"-": 2,
-	"(": 0,
-	")": 0
+	"\\pm": 2,
+	"(": 1,
+	")": 1,
+	"=": 0
 }
 
 var symbol2Normal = (s) => {
@@ -36,7 +38,10 @@ var symbol2Function = {
 	"-": "subtract",
 	"\\frac": "divide",
 	"\\frac_curry": "divide",
-	"#": "unary_minus"
+	"#": "unary_minus",
+	"\\sqrt": "sqrt",
+	"=": "equals",
+	"\\pm": "sum"
 }
 
 var tokenise = (s) => {
@@ -49,7 +54,7 @@ var tokenise = (s) => {
 		}
 	}
 	var beforeUnary = (token) => {
-		return infixes.has(token) || closingBrackets.has(token);
+		return infixes.has(token) || openingBrackets.has(token);
 	}
 	for (let i = 0; i < s.length; i++) {
 		let c = s.charAt(i);
@@ -115,7 +120,7 @@ var shuntingYard = (tokens) => {
 	// console.log(tokens);
 	while (tokens.length > 0) {
 		let token = tokens.pop();
-		// console.log(`${token} || ${output} || ${operators}`);
+		console.log(`${token} || ${output} || ${operators}`);
 		if (isOperand(token)) {
 			outputOperand(token);
 		} else if (functions.has(token)) {

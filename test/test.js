@@ -113,3 +113,10 @@ it("Simple float.", () => {
 	var expected = new math.ConstantNode("1.09");
 	assert.deepEqual(expected, expression);
 });
+
+it("Quadratic formula.", () => {
+	var expression = math.fromTex("x=\\frac{-b\\pm\\sqrt{b^2-4*a*c}}{2*a}");
+
+	// assert.deepEqual(expected, expression);
+	console.log(JSON.stringify(expression, null, 2));
+});
