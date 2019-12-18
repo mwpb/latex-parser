@@ -79,11 +79,25 @@ it("Simple unary minus.", () => {
 	assert.deepEqual(expected, expression);
 });
 
+it("Simple unary plus.", () => {
+	var expression = math.fromTex("+1");
+	var expected = new math.SymbolNode("1");
+	assert.deepEqual(expected, expression);
+});
+
 it("Unary minus.", () => {
 	var expression = math.fromTex("1+-1");
 	var n11 = new math.SymbolNode("1");
 	var n12 = new math.SymbolNode("1");
 	var minus = new math.OperatorNode("-", "unary_minus", [n11]);
 	var expected = new math.OperatorNode("+", "sum", [n12, minus]);
+	assert.deepEqual(expected, expression);
+});
+
+it("Unary plus.", () => {
+	var expression = math.fromTex("1++1");
+	var n11 = new math.SymbolNode("1");
+	var n12 = new math.SymbolNode("1");
+	var expected = new math.OperatorNode("+", "sum", [n11, n12]);
 	assert.deepEqual(expected, expression);
 });

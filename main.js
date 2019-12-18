@@ -6,6 +6,7 @@ let binaryPrefixes = new Set(["\\frac"]);
 let ignoredCommands = new Set(["\\left", "\\right", " "]);
 let rightAssoc = new Set(["\\frac", "\\frac_curry", "^"]);
 let functions = new Set(["#"]);
+let closingBrackets = new Set(["}", ")"]);
 
 var operatorPrecedence = {
 	"^": 4,
@@ -47,12 +48,17 @@ var tokenise = (s) => {
 			tokens.push(token);
 		}
 	}
+	var beforeUnary = (token) => {
+		return infixes.has(token) || closingBrackets.has(token);
+	}
 	for (let i = 0; i < s.length; i++) {
 		let c = s.charAt(i);
 		if (parens.has(c) || infixes.has(c)) {
 			inCommand = false;
-			if (c === "-" && (tokens.length == 0 || isNaN(tokens[tokens.length - 1]))) {
+			if (c === "-" && (tokens.length == 0 || beforeUnary(tokens[tokens.length - 1]))) {
 				checkThenPush("#");
+			} else if (c === "+" && (tokens.length == 0 || beforeUnary(tokens[tokens.length - 1]))) {
+				
 			} else {
 				checkThenPush(token);
 				checkThenPush(c);
@@ -100,10 +106,10 @@ var shuntingYard = (tokens) => {
 
 	let output = [];
 	let operators = [];
-	console.log(tokens);
+	// console.log(tokens);
 	while (tokens.length > 0) {
 		let token = tokens.pop();
-		console.log(`${token} || ${output} || ${operators}`);
+		// console.log(`${token} || ${output} || ${operators}`);
 		if (isOperand(token)) {
 			outputOperand(token);
 		} else if (functions.has(token)) {
