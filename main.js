@@ -68,7 +68,7 @@ var tokenise = (s) => {
 			checkThenPush(token);
 			inCommand = true;
 			token = "\\";
-		} else if (!isNaN(parseInt(c))) {
+		} else if (!isNaN(parseInt(c)) || c === ".") {
 			token += c;
 		} else if (inCommand) {
 			token += c;
@@ -90,8 +90,8 @@ var isOperand = (token) => {
 var shuntingYard = (tokens) => {
 
 	var outputOperand = (operand) => {
-		if (!isNaN(parseInt(operand))) {
-			output.push(new math.ConstantNode(parseInt(operand)));
+		if (!isNaN(parseFloat(operand))) {
+			output.push(new math.ConstantNode(parseFloat(operand)));
 		} else {
 			output.push(new math.SymbolNode(operand));
 		}
@@ -112,7 +112,7 @@ var shuntingYard = (tokens) => {
 
 	let output = [];
 	let operators = [];
-	console.log(tokens);
+	// console.log(tokens);
 	while (tokens.length > 0) {
 		let token = tokens.pop();
 		// console.log(`${token} || ${output} || ${operators}`);

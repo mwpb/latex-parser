@@ -107,3 +107,9 @@ it("Simple integer greater than 10.", () => {
 	var expected = new math.ConstantNode("109");
 	assert.deepEqual(expected, expression);
 });
+
+it("Simple float.", () => {
+	var expression = math.fromTex("1.09");
+	var expected = new math.ConstantNode("1.09");
+	assert.deepEqual(expected, expression);
+});
