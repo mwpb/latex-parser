@@ -54,13 +54,13 @@ var tokenise = (s) => {
 	for (let i = 0; i < s.length; i++) {
 		let c = s.charAt(i);
 		if (parens.has(c) || infixes.has(c)) {
+			checkThenPush(token);
 			inCommand = false;
 			if (c === "-" && (tokens.length == 0 || beforeUnary(tokens[tokens.length - 1]))) {
 				checkThenPush("#");
 			} else if (c === "+" && (tokens.length == 0 || beforeUnary(tokens[tokens.length - 1]))) {
 				
 			} else {
-				checkThenPush(token);
 				checkThenPush(c);
 			}
 			token = "";
@@ -68,6 +68,8 @@ var tokenise = (s) => {
 			checkThenPush(token);
 			inCommand = true;
 			token = "\\";
+		} else if (!isNaN(parseInt(c))) {
+			token += c;
 		} else if (inCommand) {
 			token += c;
 		} else {
@@ -88,7 +90,11 @@ var isOperand = (token) => {
 var shuntingYard = (tokens) => {
 
 	var outputOperand = (operand) => {
-		output.push(new math.SymbolNode(operand));
+		if (!isNaN(parseInt(operand))) {
+			output.push(new math.ConstantNode(parseInt(operand)));
+		} else {
+			output.push(new math.SymbolNode(operand));
+		}
 	};
 
 	var outputOperator = (operator) => {
@@ -106,7 +112,7 @@ var shuntingYard = (tokens) => {
 
 	let output = [];
 	let operators = [];
-	// console.log(tokens);
+	console.log(tokens);
 	while (tokens.length > 0) {
 		let token = tokens.pop();
 		// console.log(`${token} || ${output} || ${operators}`);
