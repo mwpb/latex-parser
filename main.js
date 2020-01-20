@@ -7,6 +7,7 @@ let ignoredCommands = new Set(["\\left", "\\right", " "]);
 let rightAssoc = new Set(["\\frac", "\\frac_curry", "^"]);
 let functions = new Set(["#", "\\sqrt"]);
 let openingBrackets = new Set(["{", "("]);
+let closingBrackets = new Set(["}", ")"]);
 
 var operatorPrecedence = {
 	"^": 4,
@@ -17,6 +18,8 @@ var operatorPrecedence = {
 	"\\pm": 2,
 	"(": 1,
 	")": 1,
+	"{": 1,
+	"}": 1,
 	"=": 0
 }
 
@@ -103,21 +106,24 @@ var shuntingYard = (tokens) => {
 	};
 
 	var outputOperator = (operator) => {
+		console.log(operator);
 		let second = output.pop();
+		console.log(second);
 		let first = output.pop();
+		console.log(first);
 		let op = new math.OperatorNode(symbol2Normal(operator), symbol2Function[operator], [first, second]);
 		output.push(op);
 	};
 
 	var outputFunction = (f) => {
 		let arg = output.pop();
-		let op = new math.OperatorNode(symbol2Normal(operator), symbol2Function[operator], [arg]);
+		let op = new math.FunctionNode(symbol2Function[operator], [arg]);
 		output.push(op);
 	};
 
 	let output = [];
 	let operators = [];
-	// console.log(tokens);
+	console.log(tokens);
 	while (tokens.length > 0) {
 		let token = tokens.pop();
 		console.log(`${token} || ${output} || ${operators}`);
@@ -145,10 +151,10 @@ var shuntingYard = (tokens) => {
 				}
 			}
 			operators.push(token);
-		} else if (token == "(") {
+		} else if (openingBrackets.has(token)) {
 			operators.push(token);
-		} else if (token == ")") {
-			while ( operators.length > 0 && operators[operators.length - 1] != "(") {
+		} else if (closingBrackets.has(token)) {
+			while ( operators.length > 0 && !openingBrackets.has(operators[operators.length - 1])) {
 				outputOperator(operators.pop());
 			}
 			if (operators[operators.length - 1] = "(") {

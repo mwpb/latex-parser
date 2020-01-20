@@ -75,7 +75,7 @@ it("Nested \\frac.", () => {
 it("Simple unary minus.", () => {
 	var expression = math.fromTex("-1");
 	var n1 = new math.ConstantNode("1");
-	var expected = new math.OperatorNode("-", "unary_minus", [n1]);
+	var expected = new math.FunctionNode("unary_minus", [n1]);
 	assert.deepEqual(expected, expression);
 });
 
@@ -89,7 +89,7 @@ it("Unary minus.", () => {
 	var expression = math.fromTex("1+-1");
 	var n11 = new math.ConstantNode("1");
 	var n12 = new math.ConstantNode("1");
-	var minus = new math.OperatorNode("-", "unary_minus", [n11]);
+	var minus = new math.FunctionNode("unary_minus", [n11]);
 	var expected = new math.OperatorNode("+", "sum", [n12, minus]);
 	assert.deepEqual(expected, expression);
 });
@@ -115,8 +115,27 @@ it("Simple float.", () => {
 });
 
 it("Quadratic formula.", () => {
-	var expression = math.fromTex("x=\\frac{-b\\pm\\sqrt{b^2-4*a*c}}{2*a}");
-
-	// assert.deepEqual(expected, expression);
+	var expression = math.fromTex("x=\\frac{-b+\\sqrt{b^2-4*a*c}}{2*a}");
+	var n21 = new math.ConstantNode(2);
+	var n22 = new math.ConstantNode(2);
+	var n4 = new math.ConstantNode(4);
+	var x = new math.SymbolNode("x");
+	var a1 = new math.SymbolNode("a");
+	var a2 = new math.SymbolNode("a");
+	var b1 = new math.SymbolNode("b");
+	var b2 = new math.SymbolNode("b");
+	var c = new math.SymbolNode("c");
+	var twoa = new math.OperatorNode("*", "multiply", [n22, a1]);
+	var foura = new math.OperatorNode("*", "multiply", [n4, a2]);
+	var fourac = new math.OperatorNode("*", "multiply", [foura, c]);
+	var bsquared = new math.OperatorNode("^", "pow", [b2, n21]);
+	var discriminant = new math.OperatorNode("-", "subtract", [bsquared, fourac]);
+	var minusb = new math.OperatorNode("-", "unary_minus", [b1]);
+	console.log(discriminant);
+	var sqrt = new math.FunctionNode("sqrt", [discriminant]);
+	var top = new math.OperatorNode("+", "sum", [minusb, sqrt]);
+	var frac = new math.OperatorNode("/", "divide", [top, twoa]);
+	var expected = new math.OperatorNode("=", "equals", [x, frac]);
+	assert.deepEqual(expected, expression);
 	console.log(JSON.stringify(expression, null, 2));
 });
