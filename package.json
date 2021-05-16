@@ -13,6 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "esm": "^3.2.25",
-    "mathjs": "^6.2.5"
+    "mathjs": "^7.5.1"
   }
 }
